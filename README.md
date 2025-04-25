@@ -10,6 +10,10 @@ After talking with Luke Fair about D3 for some time in my phone screen, I decide
 
 3. D3 wasn't behaving super well with all of the extra text I was shoving into the tick marks.
 
+So I threw that idea into the trash and represented the games with squares instead, kind of like a typical calendar-based schedule. I figured I didn't have time to build calendar spacing and formatting into this project, so the game order is pegged to the first game of the regular season and flows left-to-right before starting a new line. Below the header bar is an animated drawer containing some cumulative team statistics, including the win-loss sparkline that inspired this project in the first place. Clicking ona square gives you the starting pitcher statistics for that game in a modal window.
+
+I incorporated the Rays' city connect colors into the theme of the application to give the app some flair and built the application to run entirely within one page using Vue Single File Components. There's so much more I would have loved to do with this, like handling spring training and post-season games, letting the user choose the season they want to view, and building an actual calendar into the application. But I wanted to give you all an honest look at what I can make in about 2 hours, so I limited the scope of the project to only this year's regular season games.
+
 ## Recommended IDE Setup
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
