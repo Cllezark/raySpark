@@ -1,13 +1,11 @@
 <script setup>
-import MLBGames from './components/MLBGames.vue'
-// import TitleBar from './components/TitleBar.vue'
+import RaysGames from './components/RaysGames.vue'
 </script>
 
 <template>
   <div class="app">
-    <!-- <TitleBar /> -->
     <main>
-      <MLBGames />
+      <RaysGames />
     </main>
   </div>
 </template>

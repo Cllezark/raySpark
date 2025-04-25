@@ -39,7 +39,7 @@ const mlbTeamMap = {
 const games = ref([])
 const containerRef = ref(null)
 
-const fetchMLBGames = async () => {
+const fetchRaysGames = async () => {
   try {
     const res = await fetch(
       'https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId=139&hydrate=probablePitcher,stats&startDate=2025-03-01&endDate=2025-06-01',
@@ -94,7 +94,7 @@ const fetchMLBGames = async () => {
 }
 
 onMounted(() => {
-  fetchMLBGames()
+  fetchRaysGames()
 })
 
 const stats = computed(() => {
