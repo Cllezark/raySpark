@@ -29,9 +29,8 @@ defineProps({
   <div>
     <div class="title-bar">
       <div class="title-content">
-        <!-- <h1 class="win-ratio">{{ (wins / (wins + losses)).toPrecision(3) }}</h1> -->
         <h1 class="season-title">{{ title }}</h1>
-        <!-- <h1 class="record">{{ wins }} - {{ losses }}</h1> -->
+        <!-- maybe this could be configurable one day? -->
       </div>
     </div>
     <StatsDrawer :wins="wins" :losses="losses" :runDifferential="runDifferential" :games="games" />
@@ -77,6 +76,10 @@ h1 {
   background-clip: text;
   color: transparent;
   text-shadow: none;
+  /* Fallback for browsers that don't support gradient text */
+  @supports not (background-clip: text) {
+    color: var(--gradient-middle);
+  }
 }
 
 .win-ratio {

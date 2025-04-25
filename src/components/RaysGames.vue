@@ -1,95 +1,32 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { fetchMLBSchedule } from '../services/mlbApi'
+import { filterFinalGames, transformGameData } from '../utils/gameTransformer'
+import { RAYS_TEAM_ID } from '../constants/mlb'
 import GameSquare from './GameSquare.vue'
 import TitleBar from './TitleBar.vue'
 import PitcherStats from './PitcherStats.vue'
 
-const mlbTeamMap = {
-  'Arizona Diamondbacks': 'ARI',
-  'Atlanta Braves': 'ATL',
-  'Baltimore Orioles': 'BAL',
-  'Boston Red Sox': 'BOS',
-  'Chicago White Sox': 'CWS',
-  'Chicago Cubs': 'CHC',
-  'Cincinnati Reds': 'CIN',
-  'Cleveland Guardians': 'CLE',
-  'Colorado Rockies': 'COL',
-  'Detroit Tigers': 'DET',
-  'Houston Astros': 'HOU',
-  'Kansas City Royals': 'KC',
-  'Los Angeles Angels': 'LAA',
-  'Los Angeles Dodgers': 'LAD',
-  'Miami Marlins': 'MIA',
-  'Milwaukee Brewers': 'MIL',
-  'Minnesota Twins': 'MIN',
-  'New York Yankees': 'NYY',
-  'New York Mets': 'NYM',
-  Athletics: 'ATH',
-  'Philadelphia Phillies': 'PHI',
-  'Pittsburgh Pirates': 'PIT',
-  'San Diego Padres': 'SD',
-  'San Francisco Giants': 'SF',
-  'Seattle Mariners': 'SEA',
-  'St. Louis Cardinals': 'STL',
-  'Tampa Bay Rays': 'TB',
-  'Texas Rangers': 'TEX',
-  'Toronto Blue Jays': 'TOR',
-  'Washington Nationals': 'WSH',
-}
 const games = ref([])
-const containerRef = ref(null)
+const isLoading = ref(false)
+const error = ref(null)
 
 const fetchRaysGames = async () => {
+  isLoading.value = true
+  error.value = null
+
   try {
-    const res = await fetch(
-      'https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId=139&hydrate=probablePitcher,stats&startDate=2025-03-01&endDate=2025-06-01',
-    )
-    const data = await res.json()
+    // Extract
+    const mlbGames = await fetchMLBSchedule(RAYS_TEAM_ID, '2025-03-01', '2025-06-01')
 
-    games.value = data.dates
-      .flatMap((date) => date.games)
-      .filter(
-        (game) =>
-          game.status.detailedState === 'Final' &&
-          new Date(game.gameDate) >= new Date('2025-03-28'),
-      )
-      .map((game) => {
-        const raysIsHome = game.teams.home.team.id === 139
-        const team = raysIsHome ? game.teams.home : game.teams.away
-        const opponent = raysIsHome ? game.teams.away : game.teams.home
-        const raysScore = team.score
-        const opponentScore = opponent.score
-        const result =
-          raysScore > opponentScore ? 'Win' : raysScore < opponentScore ? 'Loss' : 'Tie'
-
-        const probablePitcher = team.probablePitcher
-        const pitchingStats = probablePitcher?.stats?.find(
-          (stat) => stat.group?.displayName === 'pitching' && stat.type?.displayName === 'gameLog',
-        )
-
-        const formattedDate = new Date(game.gameDate).toLocaleDateString('en-US', {
-          month: '2-digit',
-          day: '2-digit',
-        })
-
-        const opponentAbbreviation = mlbTeamMap[opponent.team.name] || opponent.team.name
-
-        return {
-          gamePk: game.gamePk,
-          date: formattedDate,
-          location: raysIsHome ? 'vs.' : '@',
-          opponent: opponentAbbreviation,
-          result,
-          score: `${raysScore}-${opponentScore}`,
-          pitcher: probablePitcher?.fullName ?? 'N/A',
-          inningsPitched: pitchingStats?.stats?.inningsPitched ?? 'N/A',
-          strikeouts: pitchingStats?.stats?.strikeOuts ?? 'N/A',
-          baseOnBalls: pitchingStats?.stats?.baseOnBalls ?? 'N/A',
-          earnedRuns: pitchingStats?.stats?.earnedRuns ?? 'N/A',
-        }
-      })
-  } catch (error) {
-    console.error('Error fetching MLB games:', error)
+    // Transform
+    const finalGames = filterFinalGames(mlbGames)
+    games.value = finalGames.map(transformGameData)
+  } catch (err) {
+    error.value = err.message
+    console.error('Error fetching MLB games:', err)
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -117,22 +54,23 @@ const showPitcherStats = (game) => {
   isModalVisible.value = true
 }
 
-const closeModal = () => {
+const closePitcherStats = () => {
   isModalVisible.value = false
   selectedGame.value = null
 }
 </script>
 
 <template>
-  <div class="mlb-games">
-    <TitleBar
-      :wins="stats.wins"
-      :losses="stats.losses"
-      :ties="stats.ties"
-      :runDifferential="stats.runDifferential"
-      :games="games"
-    />
-    <div class="calendar-container" ref="containerRef">
+  <div class="rays-games">
+    <TitleBar v-bind="stats" :games="games" />
+
+    <div v-if="error" class="error-message">
+      {{ error }}
+    </div>
+
+    <div v-else-if="isLoading" class="loading-state">Loading games...</div>
+
+    <div v-else class="game-grid-container">
       <div class="game-grid">
         <GameSquare
           v-for="game in games"
@@ -153,19 +91,19 @@ const closeModal = () => {
       v-if="selectedGame"
       v-bind="selectedGame"
       :isVisible="isModalVisible"
-      @close="closeModal"
+      @close="closePitcherStats"
     />
   </div>
 </template>
 
 <style scoped>
-.mlb-games {
+.rays-games {
   margin: 2rem auto;
   max-width: 1200px;
   padding: 0 1rem;
 }
 
-.calendar-container {
+.game-grid-container {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -180,7 +118,6 @@ const closeModal = () => {
   padding: 1rem;
 }
 
-/* Remove all transform styles since we don't need them anymore */
 :deep(.game-square) {
   position: relative;
   transition: transform 0.2s ease;
@@ -192,26 +129,26 @@ const closeModal = () => {
 }
 
 /* Customize scrollbar appearance */
-.calendar-container::-webkit-scrollbar {
+.game-grid-container::-webkit-scrollbar {
   height: 8px;
 }
 
-.calendar-container::-webkit-scrollbar-track {
+.game-grid-container::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 4px;
 }
 
-.calendar-container::-webkit-scrollbar-thumb {
+.game-grid-container::-webkit-scrollbar-thumb {
   background: #888;
   border-radius: 4px;
 }
 
-.calendar-container::-webkit-scrollbar-thumb:hover {
+.game-grid-container::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
 
 @media (max-width: 768px) {
-  .mlb-games {
+  .rays-games {
     padding: 0;
   }
 

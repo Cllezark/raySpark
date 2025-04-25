@@ -45,18 +45,18 @@ const toggleDrawer = () => {
           </h1>
         </div>
         <div class="stat-item">
-          <h1 class="record">
-            Record:
-            <span :class="{ winning: wins > losses, losing: wins < losses }">
-              {{ wins }} - {{ losses }}
-            </span>
-          </h1>
-        </div>
-        <div class="stat-item">
           <h1 class="runDifferential">
             Runs:
             <span :class="{ positive: runDifferential > 0, negative: runDifferential < 0 }">
               {{ runDifferential > 0 ? '+' : '' }}{{ runDifferential }}
+            </span>
+          </h1>
+        </div>
+        <div class="stat-item">
+          <h1 class="record">
+            Record:
+            <span :class="{ winning: wins > losses, losing: wins < losses }">
+              {{ wins }} - {{ losses }}
             </span>
           </h1>
         </div>
@@ -72,6 +72,7 @@ const toggleDrawer = () => {
 </template>
 
 <style scoped>
+/* Layout */
 .stats-drawer {
   position: fixed;
   top: 4rem;
@@ -101,6 +102,7 @@ const toggleDrawer = () => {
   grid-column: 1 / -1;
 }
 
+/* Pull Tab */
 .pull-tab {
   position: absolute;
   bottom: -30px;
@@ -133,6 +135,28 @@ const toggleDrawer = () => {
   transform: translateX(-50%) translateY(-100%);
 }
 
+/* Stats Styling */
+.win-ratio span,
+.record span,
+.runDifferential span {
+  transition: color 0.3s ease;
+}
+
+/* Winning States */
+.win-ratio span.above-500,
+.record span.winning,
+.runDifferential span.positive {
+  color: #7fff00;
+}
+
+/* Losing States */
+.win-ratio span.below-500,
+.record span.losing,
+.runDifferential span.negative {
+  color: #00bfff;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
   .stats-grid {
     grid-template-columns: 1fr;
@@ -143,41 +167,5 @@ const toggleDrawer = () => {
   .stat-item {
     padding: 1rem;
   }
-}
-
-.runDifferential span {
-  transition: color 0.3s ease;
-}
-
-.runDifferential span.positive {
-  color: #7fff00;
-}
-
-.runDifferential span.negative {
-  color: #00bfff;
-}
-
-.win-ratio span {
-  transition: color 0.3s ease;
-}
-
-.win-ratio span.above-500 {
-  color: #7fff00;
-}
-
-.win-ratio span.below-500 {
-  color: #00bfff;
-}
-
-.record span {
-  transition: color 0.3s ease;
-}
-
-.record span.winning {
-  color: #7fff00;
-}
-
-.record span.losing {
-  color: #00bfff;
 }
 </style>

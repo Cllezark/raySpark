@@ -60,25 +60,12 @@ const squareColor = computed(() => {
       return ''
   }
 })
-
-const squarePosition = computed(() => {
-  switch (props.result) {
-    case 'Win':
-      return 'above'
-    case 'Loss':
-      return 'below'
-    case 'Tie':
-      return 'center'
-    default:
-      return ''
-  }
-})
 </script>
 
 <template>
   <div
     class="game-square"
-    :class="[squareColor, squarePosition]"
+    :class="[squareColor]"
     :data-game-pk="$attrs['data-game-pk']"
     @click="$emit('showStats')"
   >
@@ -121,10 +108,6 @@ const squarePosition = computed(() => {
   background-color: #bf0000;
 }
 
-.tie {
-  background-color: #707070;
-}
-
 .date {
   font-size: 0.8rem;
   font-weight: bold;
@@ -149,18 +132,16 @@ const squarePosition = computed(() => {
   font-size: 0.9rem;
 }
 
-/* Simplified styling for tie games - just keep positioning */
 .center {
   padding: 0.5rem;
-  justify-content: flex-start; /* Align content like other game squares */
+  justify-content: flex-start;
   text-align: left;
 }
 
 .center .content {
-  gap: 0.5rem; /* Match gap with other game squares */
+  gap: 0.5rem;
 }
 
-/* Remove the circular hover effect */
 .center:hover {
   transform: scale(1.1);
 }
@@ -179,7 +160,7 @@ const squarePosition = computed(() => {
 }
 
 .game-square {
-  position: relative; /* Add this */
+  position: relative;
 }
 
 .game-square:hover .hover-text {
