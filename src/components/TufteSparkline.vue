@@ -71,17 +71,6 @@ const drawSparkline = () => {
     .attr('fill', (d) => (d.value === 0 ? '#707070' : d.value > 0 ? '#7FFF00' : '#00BFFF'))
     .attr('height', (d) => Math.abs(y(d.value) - y(0)))
     .attr('width', x.bandwidth())
-
-  // Add a center line
-  svg
-    .append('line')
-    .attr('x1', 0)
-    .attr('x2', props.width)
-    .attr('y1', y(0))
-    .attr('y2', y(0))
-    .attr('stroke', '#4B0082')
-    .attr('stroke-width', 0.5)
-    .attr('stroke-opacity', 0.3)
 }
 
 // Watch for changes in games data
@@ -106,5 +95,12 @@ onMounted(drawSparkline)
 
 svg {
   display: block;
+}
+
+/* for some reason, my D3 sparkline does not render properly in Firefox. So I'm hiding it */
+@-moz-document url-prefix() {
+  .sparkline-container {
+    display: none;
+  }
 }
 </style>
