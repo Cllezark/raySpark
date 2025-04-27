@@ -1,9 +1,16 @@
+/** The spec laid out a pretty clear request: fetch data from this API using these query parameters and present the data back to us.
+ * I still wanted to show my understanding of ETL hygiene, so I put the hardcoded values in a constants file.
+ */
 export const RAYS_TEAM_ID = 139
 export const MLB_API_BASE_URL = 'https://statsapi.mlb.com/api/v1'
 export const SEASON_START_DATE = '2025-03-28'
-//@description I had this sparkline idea for the main visualization, but it required abbreviating a lot of data to fit in the strokes.
-// MLB_TEAM_ABBREVIATIONS is a result of that effort.
-// I ended up ditching the sparkline concept for the main visualization because it looked too sparse, but I liked the abbreviations, so they stayed.
+
+/** I had this sparkline idea for the main visualization, but it required abbreviating a lot of data to fit in the strokes.
+ * MLB_TEAM_ABBREVIATIONS is a result of that effort.
+ * I ended up ditching the sparkline concept for the main visualization because it looked too sparse,
+ * but I liked the abbreviations, so they stayed.
+ * Also super weird, but the Athletics are just called "Athletics" this year.
+ */
 export const MLB_TEAM_ABBREVIATIONS = {
   'Arizona Diamondbacks': 'ARI',
   'Atlanta Braves': 'ATL',

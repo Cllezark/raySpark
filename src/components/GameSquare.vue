@@ -48,18 +48,7 @@ const props = defineProps({
   },
 })
 
-const squareColor = computed(() => {
-  switch (props.result) {
-    case 'Win':
-      return 'win'
-    case 'Loss':
-      return 'loss'
-    case 'Tie':
-      return 'tie'
-    default:
-      return ''
-  }
-})
+const squareColor = computed(() => props.result?.toLowerCase() || '')
 </script>
 
 <template>
@@ -79,7 +68,7 @@ const squareColor = computed(() => {
         <span>{{ result.charAt(0) }}</span> {{ score }}
       </div>
     </div>
-    <div class="hover-text">🔍 Starting Pitcher Stats</div>
+    <div class="hover-text">🔍 Pitcher Stats</div>
   </div>
 </template>
 
