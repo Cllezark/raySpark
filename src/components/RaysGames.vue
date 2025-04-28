@@ -6,6 +6,9 @@ import { RAYS_TEAM_ID } from '../constants/mlb'
 import GameSquare from './GameSquare.vue'
 import TitleBar from './TitleBar.vue'
 import PitcherStats from './PitcherStats.vue'
+/** This component is the workspace for the rest of the application's workload.
+ * I didn't put my top-level logic in App.vue out of superstition.
+ */
 
 const games = ref([])
 const isLoading = ref(false)
@@ -16,10 +19,14 @@ const fetchRaysGames = async () => {
   error.value = null
 
   try {
-    // Extract
+    /** Let's get the data out of the MLB API */
     const mlbGames = await fetchMLBSchedule(RAYS_TEAM_ID, '2025-03-01', '2025-06-01')
 
-    // Transform
+    /** Transformation steps
+     * step one: filter out all unfinished games
+     * step two: trim the data down to the fields we care about
+     * if something fails, thrown an error
+     */
     const finalGames = filterFinalGames(mlbGames)
     games.value = finalGames.map(transformGameData)
   } catch (err) {
@@ -68,7 +75,10 @@ const closePitcherStats = () => {
       {{ error }}
     </div>
 
-    <div v-else-if="isLoading" class="loading-state">Loading games...</div>
+    <div v-else-if="isLoading" class="loading-container">
+      <div class="spinner"></div>
+      <span class="loading-text">Loading games...</span>
+    </div>
 
     <div v-else class="game-grid-container">
       <div class="game-grid">
@@ -155,6 +165,36 @@ const closePitcherStats = () => {
   .game-grid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 0.5rem;
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  gap: 1rem;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(127, 255, 0, 0.1);
+  border-left-color: #7fff00;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  color: #7fff00;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 </style>
