@@ -26,26 +26,6 @@ const props = defineProps({
     type: [String, Number],
     required: true,
   },
-  pitcher: {
-    type: String,
-    required: true,
-  },
-  inningsPitched: {
-    type: [String, Number],
-    required: true,
-  },
-  strikeouts: {
-    type: [String, Number],
-    required: true,
-  },
-  baseOnBalls: {
-    type: [String, Number],
-    required: true,
-  },
-  earnedRuns: {
-    type: [String, Number],
-    required: true,
-  },
 })
 
 const squareColor = computed(() => props.result?.toLowerCase() || '')

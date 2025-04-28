@@ -19,7 +19,10 @@ defineProps({
     required: true,
   },
 })
-
+/** I wanted to build a component like StatsDrawer because I felt like this app didn't _need_
+ * pages and routing at this scale, but I wanted to show off some greater complexity
+ * than just a single page.
+ */
 const isExpanded = ref(false)
 
 const toggleDrawer = () => {
@@ -55,12 +58,13 @@ const toggleDrawer = () => {
         <div class="stat-item">
           <h1 class="record">
             Record:
-            <span :class="{ winning: wins > losses, losing: wins < losses }">
+            <span :class="{ winning: wins >= losses, losing: wins < losses }">
               {{ wins }} - {{ losses }}
             </span>
           </h1>
         </div>
         <div class="stat-item sparkline">
+          <!-- This component was supposed to be the entire app, once upon a time. -->
           <TufteSparkline :games="games" height="100" />
         </div>
       </div>
@@ -80,7 +84,7 @@ const toggleDrawer = () => {
   transform: translateX(-50%);
   width: 100%;
   max-width: 1200px;
-  background: rgba(0, 0, 0, 0.85); /* Increased opacity from 0.4 to 0.85 */
+  background: rgba(0, 0, 0, 0.85);
   transition: transform 0.3s ease;
   z-index: 99;
 }

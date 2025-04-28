@@ -40,7 +40,9 @@ const fetchRaysGames = async () => {
 onMounted(() => {
   fetchRaysGames()
 })
-
+/** Breaking down the game stats for use in the StatsDrawer.
+ * Ties only come up in Spring Training, but I kept them in case we wanna try adding those later
+ */
 const stats = computed(() => {
   const wins = games.value.filter((game) => game.result === 'Win').length
   const losses = games.value.filter((game) => game.result === 'Loss').length

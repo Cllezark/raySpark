@@ -110,7 +110,6 @@ svg {
 }
 
 /* My D3 sparkline does not render properly in Firefox, so I'm hiding it. */
-/* Oh my, it also fails to render in Safari. Listen, I promise you I'm not a bum.  */
 
 @-moz-document url-prefix() {
   svg {
