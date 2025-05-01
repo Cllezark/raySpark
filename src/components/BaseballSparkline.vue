@@ -311,7 +311,15 @@ watch(
   },
 )
 
-const emit = defineEmits(['showPitcherStats'])
+const emit = defineEmits(['showPitcherStats', 'game-selected'])
+
+// Modify click handler
+watch(
+  () => selectedGame.value,
+  (game) => {
+    emit('game-selected', game) // Emit null when unselected
+  },
+)
 </script>
 
 <template>

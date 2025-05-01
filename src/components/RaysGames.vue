@@ -3,9 +3,10 @@ import { ref, onMounted, computed } from 'vue'
 import { fetchMLBSchedule } from '../services/mlbApi'
 import { filterFinalGames, transformGameData } from '../utils/gameTransformer'
 import { RAYS_TEAM_ID } from '../constants/mlb'
-import GameSquare from './GameSquare.vue'
 import TitleBar from './TitleBar.vue'
-import PitcherStats from './PitcherStats.vue'
+import BaseballSparkline from './BaseballSparkline.vue'
+import GameCard from './GameCard.vue'
+
 /** This component is the workspace for the rest of the application's workload.
  * I didn't put my top-level logic in App.vue out of superstition.
  */
@@ -13,6 +14,7 @@ import PitcherStats from './PitcherStats.vue'
 const games = ref([])
 const isLoading = ref(false)
 const error = ref(null)
+const selectedGame = ref(null)
 
 const fetchRaysGames = async () => {
   isLoading.value = true
@@ -37,6 +39,17 @@ const fetchRaysGames = async () => {
   }
 }
 
+const getGameNumber = (gameDate) => {
+  return games.value.filter((g) => new Date(g.date) <= new Date(gameDate)).length
+}
+
+const handleGameSelect = (game) => {
+  selectedGame.value = {
+    ...game,
+    gameNumber: getGameNumber(game.date),
+  }
+}
+
 onMounted(() => {
   fetchRaysGames()
 })
@@ -54,19 +67,6 @@ const stats = computed(() => {
 
   return { wins, losses, ties, runDifferential }
 })
-
-const selectedGame = ref(null)
-const isModalVisible = ref(false)
-
-const showPitcherStats = (game) => {
-  selectedGame.value = game
-  isModalVisible.value = true
-}
-
-const closePitcherStats = () => {
-  isModalVisible.value = false
-  selectedGame.value = null
-}
 </script>
 
 <template>
@@ -81,30 +81,9 @@ const closePitcherStats = () => {
       <div class="spinner"></div>
       <span class="loading-text">Loading games...</span>
     </div>
+    <BaseballSparkline :games="games" :height="100" @game-selected="handleGameSelect" />
 
-    <div v-else class="game-grid-container">
-      <div class="game-grid">
-        <GameSquare
-          v-for="game in games"
-          :key="game.gamePk"
-          :date="game.date"
-          :location="game.location"
-          :opponent="game.opponent"
-          :result="game.result"
-          :score="game.score"
-          :data-game-pk="game.gamePk"
-          v-bind="game"
-          @showStats="showPitcherStats(game)"
-        />
-      </div>
-    </div>
-
-    <PitcherStats
-      v-if="selectedGame"
-      v-bind="selectedGame"
-      :isVisible="isModalVisible"
-      @close="closePitcherStats"
-    />
+    <GameCard v-if="selectedGame" :game="selectedGame" :isVisible="!!selectedGame" />
   </div>
 </template>
 
