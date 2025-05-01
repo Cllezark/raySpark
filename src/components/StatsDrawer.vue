@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from 'vue'
-import TufteSparkline from './TufteSparkline.vue'
+// import TufteSparkline from './TufteSparkline.vue'
+import BaseballSparkline from './BaseballSparkline.vue'
+
 defineProps({
   wins: {
     type: Number,
@@ -19,6 +21,12 @@ defineProps({
     required: true,
   },
 })
+// const handlePitcherStats = (game) => {
+//   // This will trigger the PitcherStats modal
+//   selectedGame.value = game
+//   isModalVisible.value = true
+// }
+
 /** I wanted to build a component like StatsDrawer because I felt like this app didn't _need_
  * pages and routing at this scale, but I wanted to show off some greater complexity
  * than just a single page.
@@ -63,9 +71,12 @@ const toggleDrawer = () => {
             </span>
           </h1>
         </div>
+        <!-- <div class="stat-item sparkline"> -->
+        <!-- This component was supposed to be the entire app, once upon a time. -->
+        <!-- <TufteSparkline :games="games" height="100" /> -->
+        <!-- </div> -->
         <div class="stat-item sparkline">
-          <!-- This component was supposed to be the entire app, once upon a time. -->
-          <TufteSparkline :games="games" height="100" />
+          <BaseballSparkline :games="games" :height="100" @showPitcherStats="handlePitcherStats" />
         </div>
       </div>
     </div>
