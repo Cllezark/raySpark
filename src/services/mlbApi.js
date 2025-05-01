@@ -24,6 +24,7 @@ export async function fetchMLBSchedule(teamId, startDate, endDate) {
       throw new MLBApiError(`API responded with status: ${response.status}`)
     }
     const data = await response.json()
+
     return data.dates.flatMap((date) => date.games)
   } catch (error) {
     console.error('Error fetching MLB schedule:', error)

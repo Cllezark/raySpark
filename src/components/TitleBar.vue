@@ -22,6 +22,10 @@ defineProps({
     type: Array,
     required: true,
   },
+  pitcherStats: {
+    type: Array,
+    default: () => [],
+  },
 })
 </script>
 
@@ -33,7 +37,13 @@ defineProps({
         <!-- maybe this could be configurable one day? -->
       </div>
     </div>
-    <StatsDrawer :wins="wins" :losses="losses" :runDifferential="runDifferential" :games="games" />
+    <StatsDrawer
+      :wins="wins"
+      :losses="losses"
+      :runDifferential="runDifferential"
+      :games="games"
+      :pitcher-stats="pitcherStats"
+    />
   </div>
 </template>
 

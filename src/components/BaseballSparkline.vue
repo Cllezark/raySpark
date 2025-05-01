@@ -328,9 +328,9 @@ watch(
       <svg :width="containerWidth" ref="svgRef" :height="height" overflow="visible"></svg>
 
       <!-- Hover info -->
-      <div v-if="hoveredGame && !selectedGame" class="hover-info">
+      <!-- <div v-if="hoveredGame && !selectedGame" class="hover-info">
         {{ hoveredGame.date }} {{ hoveredGame.location }} {{ hoveredGame.opponent }}
-      </div>
+      </div> -->
     </div>
   </div>
 </template>

@@ -15,7 +15,6 @@ export function transformGameData(game) {
   const raysIsHome = game.teams.home.team.id === RAYS_TEAM_ID
   const team = raysIsHome ? game.teams.home : game.teams.away
   const opponent = raysIsHome ? game.teams.away : game.teams.home
-
   const pitchingStats = getPitchingStats(team.probablePitcher)
 
   return {
@@ -26,7 +25,11 @@ export function transformGameData(game) {
     result: determineGameResult(team.score, opponent.score),
     score: `${team.score}-${opponent.score}`,
     pitcher: team.probablePitcher?.fullName ?? 'N/A',
-    ...extractPitchingStats(pitchingStats),
+    inningsPitched: pitchingStats?.inningsPitched ?? '0',
+    earnedRuns: pitchingStats?.earnedRuns ?? '0',
+    strikeouts: pitchingStats?.strikeOuts ?? '0',
+    baseOnBalls: pitchingStats?.baseOnBalls ?? '0',
+    hits: pitchingStats?.hits ?? '0',
   }
 }
 

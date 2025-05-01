@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { fetchMLBSchedule } from '../services/mlbApi'
 import { filterFinalGames, transformGameData } from '../utils/gameTransformer'
+import { transformPitchersData } from '../utils/pitchersTransformer'
 import { RAYS_TEAM_ID } from '../constants/mlb'
 import TitleBar from './TitleBar.vue'
 import BaseballSparkline from './BaseballSparkline.vue'
@@ -15,6 +16,7 @@ const games = ref([])
 const isLoading = ref(false)
 const error = ref(null)
 const selectedGame = ref(null)
+const isGameCardVisible = ref(false) // New ref for visibility control
 
 const fetchRaysGames = async () => {
   isLoading.value = true
@@ -44,9 +46,24 @@ const getGameNumber = (gameDate) => {
 }
 
 const handleGameSelect = (game) => {
-  selectedGame.value = {
-    ...game,
-    gameNumber: getGameNumber(game.date),
+  if (!game) {
+    // Clicking off - hide card and clear selection
+    isGameCardVisible.value = false
+    selectedGame.value = null
+    return
+  }
+
+  if (selectedGame.value?.gamePk === game.gamePk) {
+    // Clicking same game - hide card and clear selection
+    isGameCardVisible.value = false
+    selectedGame.value = null
+  } else {
+    // New game selected - show card with new game
+    selectedGame.value = {
+      ...game,
+      gameNumber: getGameNumber(game.date),
+    }
+    isGameCardVisible.value = true
   }
 }
 
@@ -67,11 +84,15 @@ const stats = computed(() => {
 
   return { wins, losses, ties, runDifferential }
 })
+
+const pitcherStats = computed(() => {
+  return transformPitchersData(games.value)
+})
 </script>
 
 <template>
   <div class="rays-games">
-    <TitleBar v-bind="stats" :games="games" />
+    <TitleBar v-bind="stats" :games="games" :pitcher-stats="pitcherStats" />
 
     <div v-if="error" class="error-message">
       {{ error }}
@@ -81,9 +102,14 @@ const stats = computed(() => {
       <div class="spinner"></div>
       <span class="loading-text">Loading games...</span>
     </div>
-    <BaseballSparkline :games="games" :height="100" @game-selected="handleGameSelect" />
+    <BaseballSparkline
+      :games="games"
+      :height="100"
+      @game-selected="handleGameSelect"
+      @game-deselected="() => handleGameSelect(null)"
+    />
 
-    <GameCard v-if="selectedGame" :game="selectedGame" :isVisible="!!selectedGame" />
+    <GameCard v-if="selectedGame" :game="selectedGame" :isVisible="isGameCardVisible" />
   </div>
 </template>
 

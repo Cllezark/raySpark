@@ -1,9 +1,9 @@
 <script setup>
-import { ref } from 'vue'
-// import TufteSparkline from './TufteSparkline.vue'
-import BaseballSparkline from './BaseballSparkline.vue'
+import { ref, watch } from 'vue'
+// import BaseballSparkline from './BaseballSparkline.vue'
+import PitcherCard from './PitcherCard.vue'
 
-defineProps({
+const props = defineProps({
   wins: {
     type: Number,
     required: true,
@@ -20,17 +20,21 @@ defineProps({
     type: Array,
     required: true,
   },
+  pitcherStats: {
+    type: Array,
+    default: () => [],
+  },
 })
-// const handlePitcherStats = (game) => {
-//   // This will trigger the PitcherStats modal
-//   selectedGame.value = game
-//   isModalVisible.value = true
-// }
 
-/** I wanted to build a component like StatsDrawer because I felt like this app didn't _need_
- * pages and routing at this scale, but I wanted to show off some greater complexity
- * than just a single page.
- */
+// Add watcher to debug incoming data
+watch(
+  () => props.pitcherStats,
+  (newVal) => {
+    console.log('Pitcher stats in drawer:', newVal)
+  },
+  { immediate: true },
+)
+
 const isExpanded = ref(false)
 
 const toggleDrawer = () => {
@@ -71,12 +75,22 @@ const toggleDrawer = () => {
             </span>
           </h1>
         </div>
-        <!-- <div class="stat-item sparkline"> -->
-        <!-- This component was supposed to be the entire app, once upon a time. -->
-        <!-- <TufteSparkline :games="games" height="100" /> -->
-        <!-- </div> -->
-        <div class="stat-item sparkline">
+        <!-- <div class="stat-item sparkline">
           <BaseballSparkline :games="games" :height="100" @showPitcherStats="handlePitcherStats" />
+        </div> -->
+
+        <!-- Pitcher Stats Section -->
+        <div class="pitchers-section">
+          <h2 class="section-title">Starting Rotation</h2>
+          <div class="pitchers-grid">
+            <div v-if="pitcherStats.length === 0" class="no-stats">No pitcher stats available</div>
+            <PitcherCard
+              v-else
+              v-for="pitcher in pitcherStats"
+              :key="pitcher.name"
+              :pitcher="pitcher"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -100,21 +114,43 @@ const toggleDrawer = () => {
   z-index: 99;
 }
 
+/* Layout adjustments for stats grid */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  padding: 2rem;
+  gap: 1rem; /* Reduced from 1.5rem */
+  padding: 1rem 1.5rem; /* Reduced from 2rem, kept horizontal breathing room */
 }
 
 .stat-item {
   background: rgba(255, 255, 255, 0.05);
-  padding: 1.5rem;
+  padding: 1rem; /* Reduced from 1.5rem */
   border-radius: 8px;
 }
 
 .sparkline {
   grid-column: 1 / -1;
+}
+
+/* Adjusted spacing for pitcher section */
+.pitchers-section {
+  grid-column: 1 / -1;
+  margin-top: 1rem; /* Reduced from 2rem */
+}
+
+.section-title {
+  color: #7fff00;
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem; /* Reduced from 1rem */
+  text-align: center;
+}
+
+.pitchers-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* Reduced from 0.75rem */
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 /* Pull Tab */
@@ -171,16 +207,24 @@ const toggleDrawer = () => {
   color: #00bfff;
 }
 
+/* Pitcher Stats Section */
+.no-stats {
+  color: #00bfff;
+  text-align: center;
+  grid-column: 1 / -1;
+  padding: 1rem;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .stats-grid {
     grid-template-columns: 1fr;
-    padding: 1rem;
-    gap: 1rem;
+    padding: 0.75rem; /* Further reduced for mobile */
+    gap: 0.75rem;
   }
 
   .stat-item {
-    padding: 1rem;
+    padding: 0.75rem;
   }
 }
 </style>

@@ -12,7 +12,7 @@ const props = defineProps({
       'result' in value &&
       'score' in value &&
       'pitcher' in value &&
-      'gameNumber' in value, // Add gameNumber validation
+      'gameNumber' in value,
   },
   isVisible: {
     type: Boolean,
@@ -20,13 +20,12 @@ const props = defineProps({
   },
 })
 
-// Use key to force content transition when game changes
 const contentKey = computed(() => props.game?.date || 'no-game')
 </script>
 
 <template>
-  <Transition name="slide">
-    <div v-if="isVisible" class="game-card">
+  <Transition name="slide" appear>
+    <div v-show="isVisible" class="game-card">
       <Transition name="fade" mode="out-in">
         <div :key="contentKey" class="game-content">
           <div class="game-summary">
@@ -135,16 +134,21 @@ const contentKey = computed(() => props.game?.date || 'no-game')
   color: #00bfff;
 }
 
-/* Transitions */
+/* Refined transitions */
 .slide-enter-active,
 .slide-leave-active {
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: 500px;
+  opacity: 1;
+  margin-top: 1rem;
 }
 
 .slide-enter-from,
 .slide-leave-to {
-  transform: translateY(-20px);
+  max-height: 0;
   opacity: 0;
+  margin-top: 0;
+  overflow: hidden;
 }
 
 .fade-enter-active,
