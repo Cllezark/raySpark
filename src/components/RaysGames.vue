@@ -4,7 +4,7 @@ import { fetchMLBSchedule } from '../services/mlbApi'
 import { filterFinalGames, transformGameData } from '../utils/gameTransformer'
 import { transformPitchersData } from '../utils/pitchersTransformer'
 import { RAYS_TEAM_ID } from '../constants/mlb'
-import remainingGames from '../data/remainingGames2025.json'
+// import remainingGames from '../data/remainingGames2025.json'
 import TitleBar from './TitleBar.vue'
 import BaseballSparkline from './BaseballSparkline.vue'
 import GameCard from './GameCard.vue'
@@ -36,22 +36,25 @@ const loadAllGames = async () => {
     const transformedHistorical = historicalGames.map(transformGameData)
 
     // 2. Get mock future games and add gameNumber
-    const futureGames = remainingGames.games.map((game, index) => ({
-      ...game,
-      gameNumber: transformedHistorical.length + index + 1, // Continue numbering from historical games
-      gamePk: `mock-${game.date}`, // Add unique identifier
-      dateTime: `${game.date}/2025T19:10:00Z`, // Add standard game time
-      teams: {
-        away: { team: { name: game.opponent }, score: game.score.split('-')[1] },
-        home: { team: { name: 'Rays' }, score: game.score.split('-')[0] },
-      },
-    }))
+    // const futureGames = remainingGames.games.map((game, index) => ({
+    //   ...game,
+    //   gameNumber: transformedHistorical.length + index + 1, // Continue numbering from historical games
+    //   gamePk: `mock-${game.date}`, // Add unique identifier
+    //   dateTime: `${game.date}/2025T19:10:00Z`, // Add standard game time
+    //   teams: {
+    //     away: { team: { name: game.opponent }, score: game.score.split('-')[1] },
+    //     home: { team: { name: 'Rays' }, score: game.score.split('-')[0] },
+    //   },
+    // }))
 
-    // 3. Merge both datasets
-    games.value = [
-      ...transformedHistorical, // Past games from MLB API
-      ...futureGames, // Future mock games
-    ].sort((a, b) => new Date(a.date) - new Date(b.date)) // Sort by date
+    // 3. set the games data straight (historical data only)
+    games.value = [...transformedHistorical].sort((a, b) => new Date(a.date) - new Date(b.date)) // Sort by date
+
+    // 3. Merge both datasets (use in local testing only)
+    // games.value = [
+    //   ...transformedHistorical, // Past games from MLB API
+    //   ...futureGames, // Future mock games
+    // ].sort((a, b) => new Date(a.date) - new Date(b.date)) // Sort by date
   } catch (err) {
     error.value = err.message
     console.error('Error loading games data:', err)
