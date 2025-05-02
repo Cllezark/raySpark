@@ -1,31 +1,26 @@
-/**
- * Calculates ERA: (earned runs * 9) / innings pitched
- */
+/** Calculates ERA: (earned runs * 9) / innings pitched */
 const calculateERA = (earnedRuns, inningsPitched) => {
   return ((earnedRuns * 9) / inningsPitched).toFixed(2)
 }
 
-/**
- * Calculates K/9: (strikeouts * 9) / innings pitched
- */
+/** Calculates K/9: (strikeouts * 9) / innings pitched */
 const calculateK9 = (strikeouts, inningsPitched) => {
   return ((strikeouts * 9) / inningsPitched).toFixed(2)
 }
 
-/**
- * Calculates BB/9: (walks * 9) / innings pitched
- */
+/** Calculates BB/9: (walks * 9) / innings pitched */
 const calculateBB9 = (walks, inningsPitched) => {
   return ((walks * 9) / inningsPitched).toFixed(2)
 }
 
-/**
- * Calculates WHIP: (walks + hits) / innings pitched
- */
+/** Calculates WHIP: (walks + hits) / innings pitched */
 const calculateWHIP = (walks, hits, inningsPitched) => {
   return ((walks + hits) / inningsPitched).toFixed(3)
 }
 
+/** Bundles some nice cumulative stats for each of the Rays' pitchers
+ * for display in the StatsDrawer.
+ */
 export function transformPitchersData(games) {
   const pitchersStats = {}
 
@@ -44,7 +39,7 @@ export function transformPitchersData(games) {
       }
     }
 
-    // Update cumulative stats
+    /* Update cumulative stats */
     pitchersStats[game.pitcher].gamesStarted++
     pitchersStats[game.pitcher].inningsPitched += parseFloat(game.inningsPitched || 0)
     pitchersStats[game.pitcher].earnedRuns += parseInt(game.earnedRuns || 0)
@@ -53,7 +48,7 @@ export function transformPitchersData(games) {
     pitchersStats[game.pitcher].hits += parseInt(game.hits || 0)
   })
 
-  // Calculate advanced stats for each pitcher
+  /* Calculate advanced stats for each pitcher */
   return Object.values(pitchersStats).map((pitcher) => ({
     ...pitcher,
     inningsPitched: parseFloat(pitcher.inningsPitched.toFixed(1)),

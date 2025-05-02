@@ -1,6 +1,16 @@
 <script setup>
 import { computed } from 'vue'
 
+/** The devil is in the details of the GameCard component
+ * This component is responsible for displaying the details of a single game,
+ * listening for that single game to be selected,
+ * and re-rendering game data as new games are selected.
+ *
+ * I want the GameCard to look pretty and use the window space well.
+ * That's why I have it set up with two "columns" that can become two "rows" as screen width shrinks.
+ *
+ * I'm not super good at animations, but I gave this a whirl and felt pretty good about the result.
+ */
 const props = defineProps({
   game: {
     type: Object,

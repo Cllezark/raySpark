@@ -1,4 +1,12 @@
 <script setup>
+/** Pitcher Cards are part of the data density effort.
+ * All the stats inside StatsDrawer were cumulative team stats,
+ * meanwhile all the stats inside GameCard were individual team and pitcher stats.
+ * I figured it would be nice to have cumulative pitcher stats shown somewhere,
+ * and the StatsDrawer was a natural home, so I built this component
+ * to be compact, visually striking, and informative.
+ * Even on the widest viewport setting, the PitcherCard component stays tight.
+ */
 defineProps({
   pitcher: {
     type: Object,

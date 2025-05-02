@@ -1,6 +1,11 @@
 <script setup>
 import StatsDrawer from './StatsDrawer.vue'
-
+/** When I first set up this project, I configured it with routing because I figured
+ * it could be fun to have a few pages to explore.
+ * Only after my first attempt at this project did I realize that pages were antithetical to the aesthetic
+ * I was going for. The TitleBar would have shown off some basic stats up top and had
+ * a nav menu button available. Now, it's honestly more of a hassle than anything.
+ */
 defineProps({
   title: {
     type: String,
@@ -17,10 +22,6 @@ defineProps({
   runDifferential: {
     type: Number,
     default: 0,
-  },
-  games: {
-    type: Array,
-    required: true,
   },
   pitcherStats: {
     type: Array,
@@ -41,7 +42,6 @@ defineProps({
       :wins="wins"
       :losses="losses"
       :runDifferential="runDifferential"
-      :games="games"
       :pitcher-stats="pitcherStats"
     />
   </div>

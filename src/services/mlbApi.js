@@ -1,15 +1,16 @@
 import { MLB_API_BASE_URL } from '../constants/mlb'
-//@xdescription MLBApiError is a custom error class for handling errors related to the MLB API
-// It could be fun!
+/*description MLBApiError is a custom error class for handling errors related to the MLB API
+ * It could be fun!
+ */
 export class MLBApiError extends Error {
   constructor(message) {
     super(message)
     this.name = 'MLBApiError'
   }
 }
-//@description generates a URL to fetch the MLB schedule for a specific team (the Rays) and date range
+/**description generates a URL to fetch the MLB schedule for a specific team (the Rays) and date range
 // Hardcoding felt kind of hacky in this context, please don't judge me too harshly.
-// I just wanted to get it working quickly and show that I know how to extract the data I need.
+// I just wanted to get it working quickly and show that I know how to extract the data I need. */
 export async function fetchMLBSchedule(teamId, startDate, endDate) {
   const url = new URL(`${MLB_API_BASE_URL}/schedule`)
   url.searchParams.append('sportId', '1')

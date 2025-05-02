@@ -1,7 +1,17 @@
 <script setup>
 import { ref, watch } from 'vue'
-// import BaseballSparkline from './BaseballSparkline.vue'
 import PitcherCard from './PitcherCard.vue'
+
+/** The stats drawer component is here to contain the clutter
+ * that statistical information can create.
+ * I want the RaysGames area to be clean and visually striking,
+ * but I also want to embrace data density.
+ * The stats drawer is a good compromise:
+ * data density when I want it, and mininimalism when I don't.
+ *
+ * Animations are tricky, man. I can't get this drawer to animate on close.
+ * It's probably something to do with v-show, but this is close enough for now.
+ */
 
 const props = defineProps({
   wins: {
@@ -16,17 +26,13 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
-  games: {
-    type: Array,
-    required: true,
-  },
   pitcherStats: {
     type: Array,
     default: () => [],
   },
 })
 
-// Add watcher to debug incoming data
+/* Add watcher to debug incoming data */
 watch(
   () => props.pitcherStats,
   (newVal) => {
@@ -75,11 +81,6 @@ const toggleDrawer = () => {
             </span>
           </h1>
         </div>
-        <!-- <div class="stat-item sparkline">
-          <BaseballSparkline :games="games" :height="100" @showPitcherStats="handlePitcherStats" />
-        </div> -->
-
-        <!-- Pitcher Stats Section -->
         <div class="pitchers-section">
           <h2 class="section-title">Starting Rotation</h2>
           <div class="pitchers-grid">
@@ -106,7 +107,7 @@ const toggleDrawer = () => {
   position: fixed;
   top: 4rem;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(-100%);
   width: 100%;
   max-width: 1200px;
   background: rgba(0, 0, 0, 0.85);
@@ -118,13 +119,13 @@ const toggleDrawer = () => {
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem; /* Reduced from 1.5rem */
-  padding: 1rem 1.5rem; /* Reduced from 2rem, kept horizontal breathing room */
+  gap: 1rem;
+  padding: 1rem 1.5rem;
 }
 
 .stat-item {
   background: rgba(255, 255, 255, 0.05);
-  padding: 1rem; /* Reduced from 1.5rem */
+  padding: 1rem;
   border-radius: 8px;
 }
 
@@ -135,20 +136,20 @@ const toggleDrawer = () => {
 /* Adjusted spacing for pitcher section */
 .pitchers-section {
   grid-column: 1 / -1;
-  margin-top: 1rem; /* Reduced from 2rem */
+  margin-top: 1rem;
 }
 
 .section-title {
   color: #7fff00;
   font-size: 1.5rem;
-  margin-bottom: 0.75rem; /* Reduced from 1rem */
+  margin-bottom: 0.75rem;
   text-align: center;
 }
 
 .pitchers-grid {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem; /* Reduced from 0.75rem */
+  gap: 0.5rem;
   max-width: 800px;
   margin: 0 auto;
 }
@@ -170,20 +171,23 @@ const toggleDrawer = () => {
   z-index: 98;
 }
 
+/* Pull Tab Animations */
 .pull-tab .arrow {
   color: #7fff00;
   font-size: 12px;
+  transform: rotate(0deg);
   transition: transform 0.3s ease;
   display: block;
   line-height: 30px;
 }
 
-.stats-drawer.expanded {
-  transform: translateX(-50%) translateY(0);
+.pull-tab .arrow.expanded {
+  transform: rotate(180deg);
 }
 
-.stats-drawer:not(.expanded) {
-  transform: translateX(-50%) translateY(-100%);
+/* Drawer Animations */
+.stats-drawer.expanded {
+  transform: translateX(-50%) translateY(0);
 }
 
 /* Stats Styling */

@@ -2,6 +2,9 @@
 import { ref, onMounted, watch, onUnmounted } from 'vue'
 import * as d3 from 'd3'
 
+/** I put validators here while I was experimenting with games in-progress
+ * Mocking up test data got squirrely, so I added a validator for sanity
+ */
 const props = defineProps({
   games: {
     type: Array,
@@ -23,8 +26,19 @@ const selectedGame = ref(null)
 const hoveredGame = ref(null)
 
 let cleanup = null
-
+/** when the component loads in, we need to track the state of the tick marks.
+ * we track their state because we have animations, hover events, and other components
+ *  that depend on knowing about these state changes.
+ */
 onMounted(() => {
+  /**
+   * Handles click events outside of the selected game marker.
+   * If a game is currently selected and the click occurs outside the SVG element:
+   * 1. Deselects the currently selected game
+   * 2. Resets the scale of the marker rectangle to original size
+   * 3. Returns markers to their original positions
+   * 4. Fades out the tooltip
+   */
   const handleOutsideClick = (event) => {
     if (selectedGame.value && !svgRef.value?.contains(event.target)) {
       const svg = d3.select(svgRef.value)
@@ -32,7 +46,7 @@ onMounted(() => {
 
       selectedGame.value = null
 
-      // Reset all markers
+      /* Reset all markers*/
       markers.select('rect').transition().duration(200).attr('transform', 'scale(1, 1)')
 
       markers
@@ -132,7 +146,7 @@ const drawSparkline = () => {
     .attr('class', 'tooltip-group')
     .attr('opacity', 0)
     .call((g) => {
-      // Calculate tooltip position
+      /** tooltip position tracking */
       const getTooltipY = (d) => {
         const height = Math.abs(y(d.value) - y(0))
         const baseY = y(Math.max(0, d.value))
@@ -141,7 +155,7 @@ const drawSparkline = () => {
           : baseY + height + 25 // Position below losses
       }
 
-      // Add tooltip background
+      /** tooltip background */
       g.append('rect')
         .attr('class', 'tooltip-bg')
         .attr('x', x.bandwidth() / 2 - 60) // Wider to fit all text
@@ -154,7 +168,7 @@ const drawSparkline = () => {
         .style('stroke', '#4B0082')
         .style('stroke-width', '1px')
 
-      // Single line of text with all info
+      /** tooltip text */
       g.append('text')
         .attr('class', 'tooltip-text')
         .attr('x', x.bandwidth() / 2)
@@ -168,6 +182,11 @@ const drawSparkline = () => {
 
   /** step ten: modify hover interactions */
   markers
+    /* mouseenter: Handles hover state
+     * - Scales up the hovered marker vertically (1.4x)
+     * - Shows tooltip above/below marker depending on if it's a win/loss
+     * - Updates hoveredGame reactive reference
+     */
     .on('mouseenter', (event, d) => {
       if (selectedGame.value !== d.original) {
         hoveredGame.value = d.original
@@ -182,7 +201,7 @@ const drawSparkline = () => {
           .duration(200)
           .attr('transform', 'scale(1, 1.4)')
 
-        // Move tooltip with the scaled tick mark
+        /* Move tooltip with the scaled tick mark*/
         tooltip
           .transition()
           .duration(200)
@@ -190,6 +209,12 @@ const drawSparkline = () => {
           .attr('transform', d.value > 0 ? 'translate(0, -8)' : 'translate(0, 8)') // Shift tooltip up/down based on win/loss
       }
     })
+
+    /* mouseleave: Handles exit from hover state
+     * - Resets marker scale to normal
+     * - Hides tooltip
+     * - Clears hoveredGame reactive reference
+     */
     .on('mouseleave', (event, d) => {
       if (selectedGame.value !== d.original) {
         hoveredGame.value = null
@@ -202,6 +227,11 @@ const drawSparkline = () => {
         tooltip.transition().duration(200).attr('opacity', 0).attr('transform', 'translate(0, 0)') // Reset tooltip position
       }
     })
+    /* click: Handles selection state
+     * - Expands clicked marker (5x width, 2x height)
+     * - Shifts adjacent markers outward to make room
+     * - Handles deselection and switching between selections
+     * - Updates selectedGame reactive reference */
     .on('click', (event, d) => {
       const marker = d3.select(event.currentTarget)
       const rect = marker.select('rect')
@@ -214,10 +244,10 @@ const drawSparkline = () => {
       if (selectedGame.value === d.original) {
         selectedGame.value = null
 
-        // Reset clicked marker
+        /* Reset clicked marker */
         rect.transition().duration(200).attr('transform', 'scale(1, 1)')
 
-        // Reset all marker positions
+        /* Reset all marker positions */
         markers
           .transition()
           .duration(200)
@@ -229,12 +259,12 @@ const drawSparkline = () => {
           .selectAll('.game-marker')
           .filter((d) => d.original === selectedGame.value)
 
-        // Reset previous marker
+        /* Reset previous marker*/
         previousMarker.select('rect').transition().duration(200).attr('transform', 'scale(1, 1)')
 
         previousMarker.select('.tooltip-group').transition().duration(200).attr('opacity', 0)
 
-        // Reset positions then apply new selection
+        /* Reset positions then apply new selection*/
         markers
           .transition()
           .duration(200)
@@ -249,7 +279,7 @@ const drawSparkline = () => {
               .duration(200)
               .attr('transform', 'scale(5, 2)')
 
-            // Apply new shifts
+            /* Apply new shifts*/
             markers.each(function (otherD, i) {
               if (i !== currentIndex) {
                 const shift = i < currentIndex ? -shiftDistance : shiftDistance
@@ -269,7 +299,7 @@ const drawSparkline = () => {
           .duration(200)
           .attr('transform', 'scale(5, 2)')
 
-        // Shift other markers
+        /* Shift other markers*/
         markers.each(function (otherD, i) {
           if (i !== currentIndex) {
             const shift = i < currentIndex ? -shiftDistance : shiftDistance
@@ -283,8 +313,18 @@ const drawSparkline = () => {
     })
 }
 
-// Resize observer
+/* Resize observer */
 onMounted(() => {
+  /**
+   * Sets up a ResizeObserver to monitor changes in the parent element's width
+   * and updates the sparkline visualization accordingly.
+   *
+   * Creates a ResizeObserver that:
+   * - Updates containerWidth ref when parent element size changes
+   * - Triggers redraw of sparkline on resize
+   * - Starts observing parent element if it exists
+   * - Returns cleanup function to disconnect observer when component unmounts
+   */
   const resizeObserver = new ResizeObserver((entries) => {
     for (const entry of entries) {
       containerWidth.value = entry.contentRect.width
@@ -299,12 +339,12 @@ onMounted(() => {
   return () => resizeObserver.disconnect()
 })
 
-// Watch for data changes
+/* Watch for data changes */
 watch(() => props.games, drawSparkline, { deep: true })
 watch(
   () => selectedGame.value,
   (game) => {
-    // Trigger pitcher stats modal when a game is selected
+    /* Trigger pitcher stats modal when a game is selected */
     if (game) {
       emit('showPitcherStats', game)
     }
@@ -313,7 +353,7 @@ watch(
 
 const emit = defineEmits(['showPitcherStats', 'game-selected'])
 
-// Modify click handler
+/* Modify click handler */
 watch(
   () => selectedGame.value,
   (game) => {
@@ -326,11 +366,6 @@ watch(
   <div class="sparkline-wrapper">
     <div class="sparkline-container">
       <svg :width="containerWidth" ref="svgRef" :height="height" overflow="visible"></svg>
-
-      <!-- Hover info -->
-      <!-- <div v-if="hoveredGame && !selectedGame" class="hover-info">
-        {{ hoveredGame.date }} {{ hoveredGame.location }} {{ hoveredGame.opponent }}
-      </div> -->
     </div>
   </div>
 </template>
