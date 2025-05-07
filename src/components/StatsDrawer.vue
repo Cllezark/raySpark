@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import PitcherCard from './PitcherCard.vue'
 
 /** The stats drawer component is here to contain the clutter
@@ -40,7 +40,14 @@ watch(
   },
   { immediate: true },
 )
-
+const pitcherStatsSortedByERA = computed(() => {
+  if (!props.pitcherStats) {
+    return []
+  }
+  return [...props.pitcherStats].sort((a, b) => {
+    return parseFloat(a.era) - parseFloat(b.era)
+  })
+})
 const isExpanded = ref(false)
 
 const toggleDrawer = () => {
@@ -84,10 +91,12 @@ const toggleDrawer = () => {
         <div class="pitchers-section">
           <h2 class="section-title">Starting Rotation</h2>
           <div class="pitchers-grid">
-            <div v-if="pitcherStats.length === 0" class="no-stats">No pitcher stats available</div>
+            <div v-if="pitcherStatsSortedByERA.length === 0" class="no-stats">
+              No pitcher stats available
+            </div>
             <PitcherCard
               v-else
-              v-for="pitcher in pitcherStats"
+              v-for="pitcher in pitcherStatsSortedByERA"
               :key="pitcher.name"
               :pitcher="pitcher"
             />
